@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Prenotazioni Itinerari della Salute</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-glow"></div>
+    <div class="header-content">
+      <div class="header-logo">
+        <div class="cross-icon">✚</div>
+        <div class="header-text">
+          <h1>Pannello Amministrazione</h1>
+          <p class="header-subtitle">Itinerari della Salute — Croce Rossa Molfetta</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-container">
+    <div class="admin-header">
+      <h1>📋 Lista Prenotazioni</h1>
+      <button class="export-btn" onclick="exportCSV()">📥 Esporta CSV</button>
+    </div>
+
+    <div class="admin-stats" id="admin-stats"></div>
+
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cognome</th>
+            <th>Nome</th>
+            <th>Data Nascita</th>
+            <th>Email</th>
+            <th>Telefono</th>
+            <th>Giorno</th>
+            <th>Orario</th>
+            <th>Prenotato il</th>
+          </tr>
+        </thead>
+        <tbody id="bookings-body">
+          <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">Caricamento...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p>© 2025 Croce Rossa Italiana — Comitato di Molfetta</p>
+    </div>
+  </footer>
+
+  <script>
+    let allBookings = [];
+
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get('key');
+
+    if (!key) {
+      document.getElementById('bookings-body').innerHTML =
+        '<tr><td colspan="9" style="text-align:center;padding:40px;color:#FCA5A5;">⛔ Accesso negato. Chiave mancante.</td></tr>';
+    } else {
+      loadBookings();
+    }
+
+    async function loadBookings() {
+      try {
+        const res = await fetch(`/api/admin/bookings?key=${key}`);
+        if (!res.ok) {
+          document.getElementById('bookings-body').innerHTML =
+            '<tr><td colspan="9" style="text-align:center;padding:40px;color:#FCA5A5;">⛔ Accesso negato.</td></tr>';
+          return;
+        }
+        const data = await res.json();
+        allBookings = data.bookings;
+        renderBookings();
+        renderStats();
+      } catch (err) {
+        document.getElementById('bookings-body').innerHTML =
+          '<tr><td colspan="9" style="text-align:center;padding:40px;color:#FCA5A5;">Errore di connessione.</td></tr>';
+      }
+    }
+
+    function renderBookings() {
+      const tbody = document.getElementById('bookings-body');
+      if (allBookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">Nessuna prenotazione ancora.</td></tr>';
+        return;
+      }
+
+      // Sort by date, then time
+      const sorted = [...allBookings].sort((a, b) => {
+        if (a.date !== b.date) return a.date.localeCompare(b.date);
+        return a.time.localeCompare(b.time);
+      });
+
+      tbody.innerHTML = sorted.map((b, i) => {
+        const dayLabel = b.date === '2025-05-09' ? 'Sab 9 Maggio' : 'Dom 10 Maggio';
+        const createdAt = new Date(b.createdAt).toLocaleString('it-IT');
+        return `
+          <tr>
+            <td>${i + 1}</td>
+            <td><strong>${escapeHTML(b.cognome)}</strong></td>
+            <td>${escapeHTML(b.nome)}</td>
+            <td>${b.dataNascita}</td>
+            <td>${escapeHTML(b.email)}</td>
+            <td>${escapeHTML(b.telefono)}</td>
+            <td>${dayLabel}</td>
+            <td><strong>${b.time}</strong></td>
+            <td style="font-size:0.78rem;color:var(--text-muted)">${createdAt}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderStats() {
+      const stats = document.getElementById('admin-stats');
+      const total = allBookings.length;
+      const sat = allBookings.filter(b => b.date === '2025-05-09').length;
+      const sun = allBookings.filter(b => b.date === '2025-05-10').length;
+      const maxSlots = 64; // 32 per day
+
+      stats.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-number">${total}</div>
+          <div class="stat-label">Prenotazioni Totali</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${sat}</div>
+          <div class="stat-label">Sabato 9 Maggio</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${sun}</div>
+          <div class="stat-label">Domenica 10 Maggio</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${maxSlots - total}</div>
+          <div class="stat-label">Posti Rimanenti</div>
+        </div>
+      `;
+    }
+
+    function exportCSV() {
+      if (allBookings.length === 0) return;
+
+      const headers = ['#', 'Cognome', 'Nome', 'Data Nascita', 'Email', 'Telefono', 'Giorno', 'Orario', 'Prenotato il'];
+      const sorted = [...allBookings].sort((a, b) => {
+        if (a.date !== b.date) return a.date.localeCompare(b.date);
+        return a.time.localeCompare(b.time);
+      });
+
+      const rows = sorted.map((b, i) => {
+        const dayLabel = b.date === '2025-05-09' ? 'Sabato 9 Maggio' : 'Domenica 10 Maggio';
+        return [i + 1, b.cognome, b.nome, b.dataNascita, b.email, b.telefono, dayLabel, b.time, b.createdAt];
+      });
+
+      let csv = '\uFEFF'; // BOM for Excel UTF-8
+      csv += headers.join(';') + '\n';
+      rows.forEach(r => {
+        csv += r.map(val => `"${String(val).replace(/"/g, '""')}"`).join(';') + '\n';
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `prenotazioni_itinerari_salute_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

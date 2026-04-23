@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prenotazione Itinerari della Salute - Croce Rossa Molfetta</title>
+  <meta name="description" content="Prenota la tua visita agli Itinerari della Salute organizzati dalla Croce Rossa Italiana, Comitato di Molfetta. Sabato 9 e Domenica 10 Maggio 2025.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-glow"></div>
+    <div class="header-content">
+      <div class="header-logo">
+        <div class="cross-icon">✚</div>
+        <div class="header-text">
+          <h1>Itinerari della Salute</h1>
+          <p class="header-subtitle">Croce Rossa Italiana — Comitato di Molfetta</p>
+        </div>
+      </div>
+      <div class="header-dates">
+        <span class="date-badge"><span class="date-icon">📅</span> Sab 9 Maggio</span>
+        <span class="date-badge"><span class="date-icon">📅</span> Dom 10 Maggio</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="main-container">
+
+    <!-- Closed state -->
+    <div id="closed-message" class="closed-card" style="display:none;">
+      <div class="closed-icon">🔒</div>
+      <h2>Prenotazioni chiuse</h2>
+      <p>Tutti gli slot disponibili sono stati prenotati. Grazie per l'interesse!</p>
+    </div>
+
+    <!-- Step Indicator -->
+    <div id="step-indicator" class="step-indicator">
+      <div class="step active" data-step="1">
+        <div class="step-circle">1</div>
+        <span>Data e Orario</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2">
+        <div class="step-circle">2</div>
+        <span>Dati Personali</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3">
+        <div class="step-circle">3</div>
+        <span>Conferma</span>
+      </div>
+    </div>
+
+    <!-- STEP 1: Selezione data e orario -->
+    <section id="step-1" class="card step-section">
+      <h2 class="card-title"><span class="title-icon">🗓️</span> Scegli Data e Orario</h2>
+      <p class="card-desc">Seleziona il giorno e l'orario della tua visita. Gli slot verdi sono disponibili.</p>
+
+      <!-- Day Tabs -->
+      <div class="day-tabs" id="day-tabs">
+        <button class="day-tab active" data-date="2025-05-09">
+          <span class="day-name">Sabato</span>
+          <span class="day-number">9 Maggio</span>
+          <span class="slots-count" id="count-2025-05-09"></span>
+        </button>
+        <button class="day-tab" data-date="2025-05-10">
+          <span class="day-name">Domenica</span>
+          <span class="day-number">10 Maggio</span>
+          <span class="slots-count" id="count-2025-05-10"></span>
+        </button>
+      </div>
+
+      <!-- Time slots grid -->
+      <div id="slots-container">
+        <div class="period-section">
+          <h3 class="period-title"><span class="period-icon">🌅</span> Mattina <small>(08:45 – 12:45)</small></h3>
+          <div class="slots-grid" id="morning-slots"></div>
+        </div>
+        <div class="period-section">
+          <h3 class="period-title"><span class="period-icon">🌇</span> Pomeriggio <small>(15:15 – 18:45)</small></h3>
+          <div class="slots-grid" id="afternoon-slots"></div>
+        </div>
+      </div>
+
+      <div class="selected-slot-info" id="selected-slot-info" style="display:none;">
+        <span class="check-icon">✓</span>
+        <span id="selected-slot-text"></span>
+      </div>
+
+      <button class="btn btn-primary" id="btn-step1-next" disabled>
+        Prosegui <span class="btn-arrow">→</span>
+      </button>
+    </section>
+
+    <!-- STEP 2: Dati personali -->
+    <section id="step-2" class="card step-section" style="display:none;">
+      <h2 class="card-title"><span class="title-icon">👤</span> I Tuoi Dati</h2>
+      <p class="card-desc">Inserisci i tuoi dati personali per completare la prenotazione.</p>
+
+      <form id="booking-form" autocomplete="on">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nome">Nome *</label>
+            <input type="text" id="nome" name="nome" placeholder="Il tuo nome" required autocomplete="given-name">
+          </div>
+          <div class="form-group">
+            <label for="cognome">Cognome *</label>
+            <input type="text" id="cognome" name="cognome" placeholder="Il tuo cognome" required autocomplete="family-name">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="dataNascita">Data di Nascita *</label>
+          <input type="date" id="dataNascita" name="dataNascita" required autocomplete="bday">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" placeholder="tuaemail@esempio.it" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="telefono">Telefono *</label>
+            <input type="tel" id="telefono" name="telefono" placeholder="+39 333 1234567" required autocomplete="tel">
+          </div>
+        </div>
+
+        <!-- Consenso Privacy -->
+        <div class="consent-box">
+          <label class="consent-label" for="consenso">
+            <input type="checkbox" id="consenso" name="consenso" required>
+            <span class="consent-check"></span>
+            <span class="consent-text">
+              Acconsento al trattamento dei miei dati personali ai sensi del Regolamento UE 2016/679 (GDPR) 
+              per le finalità connesse alla gestione della prenotazione e all'erogazione dei servizi sanitari 
+              nell'ambito degli "Itinerari della Salute" organizzati dalla Croce Rossa Italiana – Comitato di Molfetta. *
+            </span>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="btn-step2-back">
+            <span class="btn-arrow">←</span> Indietro
+          </button>
+          <button type="submit" class="btn btn-primary" id="btn-submit">
+            Prenota <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- STEP 3: Conferma -->
+    <section id="step-3" class="card step-section" style="display:none;">
+      <div class="success-animation">
+        <div class="success-circle">
+          <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          </svg>
+        </div>
+      </div>
+      <h2 class="card-title success-title">Prenotazione Confermata!</h2>
+      <div class="confirmation-details" id="confirmation-details"></div>
+      <p class="confirmation-note">Riceverai una conferma all'indirizzo email indicato. Ti aspettiamo!</p>
+      <button class="btn btn-primary" onclick="location.reload()">Nuova Prenotazione</button>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>© 2025 Croce Rossa Italiana — Comitato di Molfetta</p>
+      <p class="footer-small">Itinerari della Salute • 9-10 Maggio 2025</p>
+    </div>
+  </footer>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay" style="display:none;">
+    <div class="spinner"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
