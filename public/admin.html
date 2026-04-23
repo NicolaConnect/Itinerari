@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Prenotazioni Itinerari della Salute</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <header class="header">
     <div class="header-glow"></div>
@@ -47,7 +50,9 @@
           </tr>
         </thead>
         <tbody id="bookings-body">
-          <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">Caricamento...</td></tr>
+          <tr>
+            <td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">Caricamento...</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -55,7 +60,7 @@
 
   <footer class="footer">
     <div class="footer-content">
-      <p>© 2025 Croce Rossa Italiana — Comitato di Molfetta</p>
+      <p>© 2026 Croce Rossa Italiana — Comitato di Molfetta</p>
     </div>
   </footer>
 
@@ -104,7 +109,7 @@
       });
 
       tbody.innerHTML = sorted.map((b, i) => {
-        const dayLabel = b.date === '2025-05-09' ? 'Sab 9 Maggio' : 'Dom 10 Maggio';
+        const dayLabel = b.date === '2026-05-09' ? 'Sab 9 Maggio' : 'Dom 10 Maggio';
         const createdAt = new Date(b.createdAt).toLocaleString('it-IT');
         return `
           <tr>
@@ -125,8 +130,8 @@
     function renderStats() {
       const stats = document.getElementById('admin-stats');
       const total = allBookings.length;
-      const sat = allBookings.filter(b => b.date === '2025-05-09').length;
-      const sun = allBookings.filter(b => b.date === '2025-05-10').length;
+      const sat = allBookings.filter(b => b.date === '2026-05-09').length;
+      const sun = allBookings.filter(b => b.date === '2026-05-10').length;
       const maxSlots = 64; // 32 per day
 
       stats.innerHTML = `
@@ -159,7 +164,7 @@
       });
 
       const rows = sorted.map((b, i) => {
-        const dayLabel = b.date === '2025-05-09' ? 'Sabato 9 Maggio' : 'Domenica 10 Maggio';
+        const dayLabel = b.date === '2026-05-09' ? 'Sabato 9 Maggio' : 'Domenica 10 Maggio';
         return [i + 1, b.cognome, b.nome, b.dataNascita, b.email, b.telefono, dayLabel, b.time, b.createdAt];
       });
 
@@ -173,7 +178,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `prenotazioni_itinerari_salute_${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `prenotazioni_itinerari_salute_${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -185,4 +190,5 @@
     }
   </script>
 </body>
+
 </html>

@@ -12,8 +12,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // --- Generazione slot ---
 function generateSlots() {
   const days = [
-    { date: '2025-05-09', label: 'Sabato 9 Maggio 2025' },
-    { date: '2025-05-10', label: 'Domenica 10 Maggio 2025' }
+    { date: '2026-05-09', label: 'Sabato 9 Maggio 2026' },
+    { date: '2026-05-10', label: 'Domenica 10 Maggio 2026' }
   ];
 
   const morningSlots = [];
@@ -154,7 +154,7 @@ app.post('/api/book', (req, res) => {
 
 // --- API: admin - lista prenotazioni (protetto da query param) ---
 app.get('/api/admin/bookings', (req, res) => {
-  if (req.query.key !== 'crocerossa2025') {
+  if (req.query.key !== 'crocerossa2026') {
     return res.status(403).json({ error: 'Accesso negato.' });
   }
   const data = loadData();
