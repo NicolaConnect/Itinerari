@@ -2,7 +2,7 @@
 // STATE
 // ===========================
 let slotsData = null;
-let selectedDate = '2025-05-09';
+let selectedDate = '2026-05-09';
 let selectedTime = null;
 let selectedPeriod = null;
 
