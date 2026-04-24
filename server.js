@@ -18,11 +18,10 @@ const transporter = nodemailer.createTransport({
   port: process.env.SMTP_PORT || 587,
   secure: process.env.SMTP_PORT == 465, // true per 465, false per altre porte
   auth: {
-    user: process.env.SMTP_USER || 'INSERISCI_TUA_EMAIL@gmail.com',
-    pass: process.env.SMTP_PASS || 'INSERISCI_TUA_PASSWORD_APP'
+    user: process.env.SMTP_USER || 'lorenzo.detrizio@puglia.cri.it',
+    pass: process.env.SMTP_PASS || '!1971Idraulici1971!'
   }
 });
-
 async function sendConfirmationEmail(booking) {
   try {
     const info = await transporter.sendMail({
