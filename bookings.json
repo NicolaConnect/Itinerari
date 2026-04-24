@@ -1,0 +1,97 @@
+{
+  "slots": {
+    "2025-05-09": {
+      "label": "Sabato 9 Maggio 2025",
+      "morning": {
+        "08:45": null,
+        "09:00": 1776964112031,
+        "09:15": null,
+        "09:30": null,
+        "09:45": null,
+        "10:00": null,
+        "10:15": null,
+        "10:30": null,
+        "10:45": null,
+        "11:00": null,
+        "11:15": null,
+        "11:30": null,
+        "11:45": null,
+        "12:00": null,
+        "12:15": null,
+        "12:30": null,
+        "12:45": null
+      },
+      "afternoon": {
+        "15:15": null,
+        "15:30": null,
+        "15:45": null,
+        "16:00": null,
+        "16:15": null,
+        "16:30": null,
+        "16:45": null,
+        "17:00": null,
+        "17:15": null,
+        "17:30": null,
+        "17:45": null,
+        "18:00": null,
+        "18:15": null,
+        "18:30": null,
+        "18:45": null
+      }
+    },
+    "2025-05-10": {
+      "label": "Domenica 10 Maggio 2025",
+      "morning": {
+        "08:45": null,
+        "09:00": null,
+        "09:15": null,
+        "09:30": null,
+        "09:45": null,
+        "10:00": null,
+        "10:15": null,
+        "10:30": null,
+        "10:45": null,
+        "11:00": null,
+        "11:15": null,
+        "11:30": null,
+        "11:45": null,
+        "12:00": null,
+        "12:15": null,
+        "12:30": null,
+        "12:45": null
+      },
+      "afternoon": {
+        "15:15": null,
+        "15:30": null,
+        "15:45": null,
+        "16:00": null,
+        "16:15": null,
+        "16:30": null,
+        "16:45": null,
+        "17:00": null,
+        "17:15": null,
+        "17:30": null,
+        "17:45": null,
+        "18:00": null,
+        "18:15": null,
+        "18:30": null,
+        "18:45": null
+      }
+    }
+  },
+  "bookings": [
+    {
+      "id": 1776964112031,
+      "date": "2025-05-09",
+      "time": "09:00",
+      "period": "morning",
+      "nome": "Mario",
+      "cognome": "Rossi",
+      "dataNascita": "1985-03-15",
+      "email": "mario.rossi@test.it",
+      "telefono": "+39 333 1234567",
+      "consenso": true,
+      "createdAt": "2026-04-23T17:08:32.031Z"
+    }
+  ]
+}
