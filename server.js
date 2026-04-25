@@ -25,7 +25,7 @@ const transporter = nodemailer.createTransport({
 async function sendConfirmationEmail(booking) {
   try {
     const info = await transporter.sendMail({
-      from: `"Itinerari della Salute - CRI Molfetta" <${process.env.SMTP_USER || 'no-reply@example.com'}>`,
+      from: `"Itinerari della Salute - CRI Molfetta" <no-reply@crimolfetta.it>`,
       to: booking.email,
       subject: 'Conferma Prenotazione - Itinerari della Salute',
       html: `
