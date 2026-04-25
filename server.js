@@ -212,6 +212,30 @@ app.get('/api/admin/bookings', (req, res) => {
   res.json({ bookings: data.bookings });
 });
 
+// --- API: admin - elimina singola prenotazione (protetto da query param) ---
+app.delete('/api/admin/booking/:id', (req, res) => {
+  if (req.query.key !== 'crocerossa2026') {
+    return res.status(403).json({ error: 'Accesso negato.' });
+  }
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ error: 'ID non valido.' });
+  }
+  const data = loadData();
+  const idx = data.bookings.findIndex((b) => b.id === id);
+  if (idx === -1) {
+    return res.status(404).json({ error: 'Prenotazione non trovata.' });
+  }
+  const booking = data.bookings[idx];
+  const slot = data.slots[booking.date]?.[booking.period]?.[booking.time];
+  if (slot === booking.id) {
+    data.slots[booking.date][booking.period][booking.time] = null;
+  }
+  data.bookings.splice(idx, 1);
+  saveData(data);
+  res.json({ success: true, message: 'Prenotazione eliminata.' });
+});
+
 // --- API: admin - svuota database (protetto da query param) ---
 app.post('/api/admin/clear', (req, res) => {
   if (req.query.key !== 'crocerossa2026') {

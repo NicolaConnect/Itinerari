@@ -31,7 +31,7 @@
       <h1>📋 Lista Prenotazioni</h1>
       <div style="display: flex; gap: 10px;">
         <button class="export-btn" onclick="exportCSV()">📥 Esporta CSV</button>
-        <button class="export-btn" style="background-color: #DC2626;" onclick="clearDatabase()">🗑️ Svuota Database</button>
+        <button class="export-btn" style="background-color: #DC2626;" onclick="openClearDatabaseModal()">🗑️ Svuota Database</button>
       </div>
     </div>
 
@@ -50,16 +50,44 @@
             <th>Giorno</th>
             <th>Orario</th>
             <th>Prenotato il</th>
+            <th style="text-align: center; width: 1%;">Azioni</th>
           </tr>
         </thead>
         <tbody id="bookings-body">
           <tr>
-            <td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">Caricamento...</td>
+            <td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);">Caricamento...</td>
           </tr>
         </tbody>
       </table>
     </div>
   </main>
+
+  <div id="delete-booking-modal" class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="delete-booking-title" aria-hidden="true">
+    <div class="admin-modal-backdrop" onclick="closeDeleteBookingModal()"></div>
+    <div class="admin-modal-panel">
+      <h2 id="delete-booking-title">Eliminare prenotazione?</h2>
+      <p class="admin-modal-body" id="delete-booking-summary"></p>
+      <p class="admin-modal-hint">L’orario tornerà disponibile per altre prenotazioni.</p>
+      <div class="admin-modal-actions">
+        <button type="button" class="export-btn" style="background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color);" onclick="closeDeleteBookingModal()">Annulla</button>
+        <button type="button" class="export-btn" style="background-color: #DC2626;" id="delete-booking-confirm" onclick="confirmDeleteBooking()">Elimina</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="clear-database-modal" class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="clear-database-title" aria-hidden="true">
+    <div class="admin-modal-backdrop" onclick="closeClearDatabaseModal()"></div>
+    <div class="admin-modal-panel">
+      <h2 id="clear-database-title">Svuotare il database?</h2>
+      <p class="admin-modal-body" id="clear-database-body">Verranno eliminate <strong>tutte</strong> le prenotazioni. L’operazione è irreversibile e cancella definitivamente i dati.</p>
+      <p class="admin-modal-hint" id="clear-database-count-hint"></p>
+      <p class="admin-modal-hint" style="margin-top:0;">Tutti gli orari torneranno disponibili per nuove prenotazioni.</p>
+      <div class="admin-modal-actions">
+        <button type="button" class="export-btn" style="background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color);" onclick="closeClearDatabaseModal()">Annulla</button>
+        <button type="button" class="export-btn" style="background-color: #DC2626;" id="clear-database-confirm" onclick="confirmClearDatabase()">Svuota tutto</button>
+      </div>
+    </div>
+  </div>
 
   <footer class="footer">
     <div class="footer-content">
@@ -69,13 +97,14 @@
 
   <script>
     let allBookings = [];
+    let pendingDeleteId = null;
 
     const params = new URLSearchParams(window.location.search);
     const key = params.get('key');
 
     if (!key) {
       document.getElementById('bookings-body').innerHTML =
-        '<tr><td colspan="9" style="text-align:center;padding:40px;color:#FCA5A5;">⛔ Accesso negato. Chiave mancante.</td></tr>';
+        '<tr><td colspan="10" style="text-align:center;padding:40px;color:#FCA5A5;">⛔ Accesso negato. Chiave mancante.</td></tr>';
     } else {
       loadBookings();
     }
@@ -85,7 +114,7 @@
         const res = await fetch(`/api/admin/bookings?key=${key}`);
         if (!res.ok) {
           document.getElementById('bookings-body').innerHTML =
-            '<tr><td colspan="9" style="text-align:center;padding:40px;color:#FCA5A5;">⛔ Accesso negato.</td></tr>';
+            '<tr><td colspan="10" style="text-align:center;padding:40px;color:#FCA5A5;">⛔ Accesso negato.</td></tr>';
           return;
         }
         const data = await res.json();
@@ -94,14 +123,14 @@
         renderStats();
       } catch (err) {
         document.getElementById('bookings-body').innerHTML =
-          '<tr><td colspan="9" style="text-align:center;padding:40px;color:#FCA5A5;">Errore di connessione.</td></tr>';
+          '<tr><td colspan="10" style="text-align:center;padding:40px;color:#FCA5A5;">Errore di connessione.</td></tr>';
       }
     }
 
     function renderBookings() {
       const tbody = document.getElementById('bookings-body');
       if (allBookings.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">Nessuna prenotazione ancora.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);">Nessuna prenotazione ancora.</td></tr>';
         return;
       }
 
@@ -125,6 +154,9 @@
             <td>${dayLabel}</td>
             <td><strong>${b.time}</strong></td>
             <td style="font-size:0.78rem;color:var(--text-muted)">${createdAt}</td>
+            <td style="text-align:center;vertical-align:middle;">
+              <button type="button" class="admin-delete-btn" title="Elimina prenotazione" aria-label="Elimina prenotazione" onclick="openDeleteBookingModal(${b.id})">🗑️</button>
+            </td>
           </tr>
         `;
       }).join('');
@@ -157,26 +189,100 @@
       `;
     }
 
-    async function clearDatabase() {
-      if (!confirm("⚠️ ATTENZIONE ⚠️\n\nSei sicuro di voler eliminare TUTTE le prenotazioni?\nQuesta operazione è irreversibile e cancellerà definitivamente tutti i dati dal database.")) {
+    function openDeleteBookingModal(id) {
+      const b = allBookings.find((x) => x.id === id);
+      if (!b) return;
+      pendingDeleteId = id;
+      const dayLabel = b.date === '2026-05-09' ? 'Sab 9 Maggio' : 'Dom 10 Maggio';
+      const periodIt = b.period === 'morning' ? 'Mattina' : 'Pomeriggio';
+      const el = document.getElementById('delete-booking-summary');
+      el.innerHTML = `Stai per eliminare la prenotazione di <strong>${escapeHTML(b.cognome)} ${escapeHTML(b.nome)}</strong><br>
+        ${dayLabel} · <strong>${escapeHTML(b.time)}</strong> (${periodIt})<br>
+        <span style="color:var(--text-muted)">${escapeHTML(b.email)}</span>`;
+      const modal = document.getElementById('delete-booking-modal');
+      modal.setAttribute('aria-hidden', 'false');
+      document.getElementById('delete-booking-confirm').focus();
+    }
+
+    function closeDeleteBookingModal() {
+      pendingDeleteId = null;
+      document.getElementById('delete-booking-modal').setAttribute('aria-hidden', 'true');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (document.getElementById('delete-booking-modal').getAttribute('aria-hidden') === 'false') {
+        closeDeleteBookingModal();
         return;
       }
-      
+      if (document.getElementById('clear-database-modal').getAttribute('aria-hidden') === 'false') {
+        closeClearDatabaseModal();
+      }
+    });
+
+    async function confirmDeleteBooking() {
+      if (pendingDeleteId == null) return;
       try {
-        const res = await fetch(`/api/admin/clear?key=${key}`, {
-          method: 'POST'
-        });
-        
+        const res = await fetch(`/api/admin/booking/${pendingDeleteId}?key=${encodeURIComponent(key)}`, { method: 'DELETE' });
         if (!res.ok) {
-          alert("Errore durante lo svuotamento del database. Verifica i permessi.");
+          let msg = 'Errore durante l’eliminazione.';
+          try {
+            const err = await res.json();
+            if (err.error) msg = err.error;
+          } catch (_) {}
+          alert(msg);
           return;
         }
-        
-        const data = await res.json();
-        alert(data.message || "Database svuotato con successo.");
-        loadBookings(); // Ricarica la lista per mostrare zero prenotazioni
+        closeDeleteBookingModal();
+        loadBookings();
       } catch (err) {
-        alert("Errore di connessione.");
+        alert('Errore di connessione.');
+      }
+    }
+
+    function openClearDatabaseModal() {
+      const n = allBookings.length;
+      const countEl = document.getElementById('clear-database-count-hint');
+      const confirmBtn = document.getElementById('clear-database-confirm');
+      if (n === 0) {
+        countEl.textContent = 'Al momento non ci sono prenotazioni da eliminare.';
+        confirmBtn.disabled = true;
+      } else {
+        countEl.textContent = n === 1
+          ? 'È presente 1 prenotazione.'
+          : `Sono presenti ${n} prenotazioni.`;
+        confirmBtn.disabled = false;
+      }
+      const modal = document.getElementById('clear-database-modal');
+      modal.setAttribute('aria-hidden', 'false');
+      if (n === 0) {
+        document.querySelector('#clear-database-modal .admin-modal-actions button').focus();
+      } else {
+        confirmBtn.focus();
+      }
+    }
+
+    function closeClearDatabaseModal() {
+      document.getElementById('clear-database-modal').setAttribute('aria-hidden', 'true');
+    }
+
+    async function confirmClearDatabase() {
+      if (allBookings.length === 0) {
+        closeClearDatabaseModal();
+        return;
+      }
+      try {
+        const res = await fetch(`/api/admin/clear?key=${encodeURIComponent(key)}`, { method: 'POST' });
+        if (!res.ok) {
+          alert('Errore durante lo svuotamento del database. Verifica i permessi.');
+          return;
+        }
+        const data = await res.json();
+        closeClearDatabaseModal();
+        alert(data.message || 'Database svuotato con successo.');
+        loadBookings();
+      } catch (err) {
+        alert('Errore di connessione.');
       }
     }
 

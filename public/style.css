@@ -995,3 +995,103 @@ body::before {
   opacity: 0.9;
   transform: translateY(-1px);
 }
+
+.export-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.admin-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: 2.25rem;
+  padding: 0 8px;
+  background: rgba(220, 38, 38, 0.15);
+  color: #FCA5A5;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1;
+  transition: var(--transition);
+}
+
+.admin-delete-btn:hover {
+  background: rgba(220, 38, 38, 0.28);
+  color: #fff;
+}
+
+.admin-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s;
+}
+
+.admin-modal[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.admin-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 17, 23, 0.8);
+  backdrop-filter: blur(6px);
+}
+
+.admin-modal-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+}
+
+.admin-modal-panel h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: var(--text-primary);
+}
+
+.admin-modal-body {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0 0 8px 0;
+}
+
+.admin-modal-body strong {
+  color: var(--text-primary);
+}
+
+.admin-modal-hint {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin: 0 0 20px 0;
+}
+
+.admin-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
