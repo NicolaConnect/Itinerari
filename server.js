@@ -57,7 +57,6 @@ async function sendConfirmationEmail(booking) {
   }
 }
 
-
 // --- Generazione slot ---
 function generateSlots() {
   const days = [
@@ -213,9 +212,19 @@ app.get('/api/admin/bookings', (req, res) => {
   res.json({ bookings: data.bookings });
 });
 
+// --- API: admin - svuota database (protetto da query param) ---
+app.post('/api/admin/clear', (req, res) => {
+  if (req.query.key !== 'crocerossa2026') {
+    return res.status(403).json({ error: 'Accesso negato.' });
+  }
+  const initial = { slots: generateSlots(), bookings: [] };
+  saveData(initial);
+  res.json({ success: true, message: 'Database svuotato con successo.' });
+});
+
 // --- Avvio server ---
 app.listen(PORT, () => {
   console.log(`\n  🏥 Itinerari della Salute - Croce Rossa Molfetta`);
   console.log(`  ✅ Server attivo su http://localhost:${PORT}`);
-  console.log(`  📋 Admin: http://localhost:${PORT}/admin.html?key=crocerossa2025\n`);
+  console.log(`  📋 Admin: http://localhost:${PORT}/admin.html?key=crocerossa2026\n`);
 });

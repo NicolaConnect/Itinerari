@@ -173,8 +173,11 @@
       </div>
       <h2 class="card-title success-title">Prenotazione Confermata!</h2>
       <div class="confirmation-details" id="confirmation-details"></div>
-      <p class="confirmation-note">Riceverai una conferma all'indirizzo email indicato. Ti aspettiamo!</p>
-      <button class="btn btn-primary" onclick="location.reload()">Nuova Prenotazione</button>
+      <p class="confirmation-note">Riceverai una conferma all'indirizzo email indicato. Puoi scaricare o stampare la ricevuta in PDF per il giorno della visita. Ti aspettiamo!</p>
+      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap;">
+        <button class="btn btn-secondary" onclick="scaricaRicevutaPDF()">Scarica Ricevuta (PDF)</button>
+        <button class="btn btn-primary" onclick="location.reload()">Nuova Prenotazione</button>
+      </div>
     </section>
   </main>
 
@@ -195,6 +198,7 @@
   <!-- Toast notification -->
   <div id="toast" class="toast"></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
 

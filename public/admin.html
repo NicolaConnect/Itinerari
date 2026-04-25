@@ -29,7 +29,10 @@
   <main class="admin-container">
     <div class="admin-header">
       <h1>📋 Lista Prenotazioni</h1>
-      <button class="export-btn" onclick="exportCSV()">📥 Esporta CSV</button>
+      <div style="display: flex; gap: 10px;">
+        <button class="export-btn" onclick="exportCSV()">📥 Esporta CSV</button>
+        <button class="export-btn" style="background-color: #DC2626;" onclick="clearDatabase()">🗑️ Svuota Database</button>
+      </div>
     </div>
 
     <div class="admin-stats" id="admin-stats"></div>
@@ -152,6 +155,29 @@
           <div class="stat-label">Posti Rimanenti</div>
         </div>
       `;
+    }
+
+    async function clearDatabase() {
+      if (!confirm("⚠️ ATTENZIONE ⚠️\n\nSei sicuro di voler eliminare TUTTE le prenotazioni?\nQuesta operazione è irreversibile e cancellerà definitivamente tutti i dati dal database.")) {
+        return;
+      }
+      
+      try {
+        const res = await fetch(`/api/admin/clear?key=${key}`, {
+          method: 'POST'
+        });
+        
+        if (!res.ok) {
+          alert("Errore durante lo svuotamento del database. Verifica i permessi.");
+          return;
+        }
+        
+        const data = await res.json();
+        alert(data.message || "Database svuotato con successo.");
+        loadBookings(); // Ricarica la lista per mostrare zero prenotazioni
+      } catch (err) {
+        alert("Errore di connessione.");
+      }
     }
 
     function exportCSV() {
