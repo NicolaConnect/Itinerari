@@ -5,6 +5,7 @@ let slotsData = null;
 let selectedDate = '2026-05-09';
 let selectedTime = null;
 let selectedPeriod = null;
+let lastBookingDetails = null;
 
 // ===========================
 // DOM ELEMENTS
@@ -304,6 +305,15 @@ function showConfirmation(formData) {
   const dayLabel = slotsData[selectedDate].label;
   const periodLabel = selectedPeriod === 'morning' ? 'Mattina' : 'Pomeriggio';
 
+  lastBookingDetails = {
+    nome: formData.nome,
+    cognome: formData.cognome,
+    data: dayLabel,
+    orario: `${selectedTime} (${periodLabel})`,
+    email: formData.email,
+    telefono: formData.telefono
+  };
+
   const details = $('#confirmation-details');
   details.innerHTML = `
     <div class="detail-row">
@@ -359,4 +369,43 @@ function escapeHTML(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+// ===========================
+// PDF GENERATION
+// ===========================
+function scaricaRicevutaPDF() {
+  if (!lastBookingDetails) return;
+  
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // Header
+  doc.setFontSize(22);
+  doc.setTextColor(211, 47, 47); // #d32f2f
+  doc.text('Itinerari della Salute', 105, 20, null, null, 'center');
+  
+  doc.setFontSize(14);
+  doc.setTextColor(0, 0, 0);
+  doc.text('Croce Rossa Italiana - Comitato di Molfetta', 105, 30, null, null, 'center');
+
+  // Title
+  doc.setFontSize(18);
+  doc.text('Ricevuta di Prenotazione', 105, 50, null, null, 'center');
+
+  // Details
+  doc.setFontSize(12);
+  doc.text(`Nome: ${lastBookingDetails.nome}`, 20, 70);
+  doc.text(`Cognome: ${lastBookingDetails.cognome}`, 20, 80);
+  doc.text(`Data: ${lastBookingDetails.data}`, 20, 90);
+  doc.text(`Orario: ${lastBookingDetails.orario}`, 20, 100);
+  doc.text(`Email: ${lastBookingDetails.email}`, 20, 110);
+  doc.text(`Telefono: ${lastBookingDetails.telefono}`, 20, 120);
+
+  // Footer
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  doc.text('Ti ricordiamo di presentarti con qualche minuto di anticipo.', 105, 140, null, null, 'center');
+  
+  doc.save(`Ricevuta_Itinerari_Salute_${lastBookingDetails.nome}_${lastBookingDetails.cognome}.pdf`);
 }
