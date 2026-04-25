@@ -1,0 +1,22 @@
+services:
+  app:
+    build: .
+    container_name: itinerari-app
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DATA_FILE: /data/bookings.json
+    command: >
+      sh -c '
+      if [ ! -s /data/bookings.json ]; then
+        cp /app/bookings.seed.json /data/bookings.json;
+      fi;
+      node server.js
+      '
+    expose:
+      - "3000"
+    volumes:
+      - itinerari_data:/data
+
+volumes:
+  itinerari_data:
